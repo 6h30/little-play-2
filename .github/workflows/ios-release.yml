@@ -1,0 +1,114 @@
+name: iOS release (TestFlight / App Store)
+
+# Builds the signed iOS app and uploads it to App Store Connect, where it shows up in TestFlight.
+# Needs an Apple Developer account and these repository secrets (see IOS-SETUP.md):
+#   APPLE_TEAM_ID        the 10-character Team ID
+#   ASC_KEY_ID           App Store Connect API key ID
+#   ASC_ISSUER_ID        App Store Connect issuer ID
+#   ASC_KEY_P8_BASE64    the downloaded AuthKey_XXXX.p8 file, base64-encoded
+on:
+  workflow_dispatch:
+    inputs:
+      build_number:
+        description: "Build number (a whole number that must go up with every upload)"
+        default: "1"
+      version_name:
+        description: "Version shown to people"
+        default: "1.0.0"
+      upload:
+        description: "Upload to App Store Connect (untick to only produce the .ipa file)"
+        type: boolean
+        default: true
+
+jobs:
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Which Xcode is this?
+        run: xcodebuild -version
+
+      - name: Check the secrets are there
+        env:
+          T: ${{ secrets.APPLE_TEAM_ID }}
+          K: ${{ secrets.ASC_KEY_ID }}
+          I: ${{ secrets.ASC_ISSUER_ID }}
+          P: ${{ secrets.ASC_KEY_P8_BASE64 }}
+        run: |
+          for v in T K I P; do
+            if [ -z "${!v}" ]; then echo "A repository secret is missing (see IOS-SETUP.md)."; exit 1; fi
+          done
+
+      - name: Copy the site into the app
+        run: |
+          mkdir -p app/www
+          cp -r index.html style.css core.js games-science.js games-tech.js games-eng.js games-art.js games-math.js shell.js manifest.webmanifest icon.svg icon-180.png icon-192.png icon-512.png app/www/
+
+      - name: Create the iOS project
+        working-directory: app
+        env:
+          VERSION_NAME: ${{ inputs.version_name }}
+          BUILD_NUMBER: ${{ inputs.build_number }}
+        run: |
+          npm install
+          npx cap add ios
+          npx capacitor-assets generate --ios
+          npx cap sync ios
+          node patch-ios.mjs
+
+      - name: Prepare the App Store Connect key
+        env:
+          P: ${{ secrets.ASC_KEY_P8_BASE64 }}
+        run: |
+          echo "$P" | base64 -d > "$RUNNER_TEMP/AuthKey.p8"
+          echo "ASC_KEY_PATH=$RUNNER_TEMP/AuthKey.p8" >> "$GITHUB_ENV"
+
+      - name: Archive (Xcode signs automatically with the API key)
+        working-directory: app/ios/App
+        env:
+          TEAM: ${{ secrets.APPLE_TEAM_ID }}
+          KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ISSUER: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          xcodebuild -project App.xcodeproj -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/LittlePlay2.xcarchive" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER" \
+            DEVELOPMENT_TEAM="$TEAM" CODE_SIGN_STYLE=Automatic \
+            archive
+
+      - name: Export and upload
+        env:
+          TEAM: ${{ secrets.APPLE_TEAM_ID }}
+          KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ISSUER: ${{ secrets.ASC_ISSUER_ID }}
+          DEST: ${{ inputs.upload && 'upload' || 'export' }}
+        run: |
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>$DEST</string>
+            <key>teamID</key><string>$TEAM</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>uploadSymbols</key><true/>
+          </dict></plist>
+          EOF
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/LittlePlay2.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$ASC_KEY_PATH" -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER"
+          ls -la "$RUNNER_TEMP/export" || true
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !inputs.upload }}
+        with:
+          name: LittlePlay2-ios-ipa
+          path: ${{ runner.temp }}/export/*.ipa
+          if-no-files-found: error

@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Little Play 2</title>
+<meta name="description" content="STEAM learning games for children aged 3 to 5: science, technology, engineering, art and math. Runs right in the browser on phones and tablets.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Little Play 2">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#cfe4ff">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- Home: the five STEAM subjects, then the games of one subject -->
+  <section id="menu" class="screen">
+    <button id="menuBack" class="round-btn hidden" aria-label="Back">◀&#xFE0E;</button>
+    <div id="menuTitle" class="menu-title">Little Play 2</div>
+    <div id="gridwrap"><div id="grid"></div></div>
+    <button id="gear" class="gate" aria-label="For parents (hold for 2 seconds)">⚙️<i class="fill"></i></button>
+  </section>
+
+  <!-- Game screen -->
+  <section id="stage" class="screen hidden">
+    <div id="game"></div>
+    <button id="home" aria-label="Back to the games">🏠</button>
+  </section>
+
+  <!-- Shown only while the screen is locked (Android screen pinning): hold 3 seconds to unlock -->
+  <button id="unlock" class="gate hidden" aria-label="Unlock the screen (hold for 3 seconds)">🔒<i class="fill"></i></button>
+
+  <!-- Play time is over -->
+  <div id="bye" class="hidden">
+    <div class="moon">🌙</div>
+    <div class="bye-text">All done playing!<br>See you next time.</div>
+    <button id="byeResume" class="gate small">Parents: keep playing (hold for 2 seconds)<i class="fill"></i></button>
+  </div>
+
+  <!-- Parent area -->
+  <div id="panel" class="hidden">
+    <div class="sheet">
+      <header><h2>For parents</h2><button id="panelClose" aria-label="Close">✕</button></header>
+
+      <div class="row"><span>Volume</span><input id="vol" type="range" min="0" max="100"></div>
+
+      <div class="row"><span>Voice</span>
+        <div class="seg" data-key="voice"><button data-v="true">On</button><button data-v="false">Off</button></div></div>
+
+      <div class="row"><span>Child's age</span>
+        <div class="seg" data-key="age"><button data-v="3">3 years</button><button data-v="4">4 years</button><button data-v="5">5 years</button></div></div>
+
+      <div class="row"><span>Play timer</span>
+        <div class="seg" data-key="timer"><button data-v="0">Off</button><button data-v="10">10 min</button><button data-v="15">15 min</button><button data-v="20">20 min</button></div></div>
+
+      <div class="row">
+        <button id="testVoice" class="btn">🔊 Test voice</button>
+        <button id="fsBtn" class="btn">⛶ Full screen</button>
+        <button id="resetTimer" class="btn">⏱ Reset play time</button>
+      </div>
+      <p id="voiceInfo" class="note"></p>
+
+      <div id="lockRow" class="lock-row">
+        <button id="lockBtn" class="btn">🔒 Lock the screen while my child plays</button>
+        <p class="note">Your child can't leave the app by accident. To unlock, hold the 🔒 button for 3 seconds. The first time, Android asks you to confirm.</p>
+      </div>
+
+      <div id="guidedRow" class="guided-row">
+        <p class="note"><b>Keep your child in the app:</b> turn on Guided Access once in Settings → Accessibility → Guided Access. Then triple-click the side button (or the Home button) while the app is open and tap Start. Your child can't leave the app until you triple-click again.</p>
+      </div>
+
+      <details open>
+        <summary>How the games help your child learn</summary>
+        <ul class="why">
+          <li><b>Science: predict, then find out.</b> Before a ball is dropped in the water, the child guesses "sink or float?". Children this age learn most when they make a guess and then see what really happens.</li>
+          <li><b>Technology: first steps in coding.</b> Putting arrows in order to guide a robot teaches sequences and "what comes next", the idea behind every program. Pixel pictures show how a screen is made of tiny squares.</li>
+          <li><b>Engineering: build, test, improve.</b> Stacking blocks, fitting gears and rolling a ball down a ramp all let the child try something, watch it work (or wobble) and try again.</li>
+          <li><b>Art: colours, patterns and symmetry.</b> Mixing paint, continuing a pattern and painting in a mirror build the eye for how things repeat and fit together.</li>
+          <li><b>Math: count, add, compare.</b> Counting real things, adding with pictures, balancing a scale and putting things in size order come before written numbers.</li>
+          <li><b>No losing, no clock, no ads.</b> A wrong answer wiggles and the child tries again, with a hint after a few tries. The games get a little harder after two right answers in a row and a little easier after two misses, so they stay fun and not frustrating. The stars on each game only go up.</li>
+          <li><b>Short sessions, play together.</b> The WHO advises no more than 1 hour of screen time a day at ages 2 to 4, and less is better. The American Academy of Pediatrics suggests playing along with your child. That is why there is a timer and a "see you next time" screen.</li>
+          <li><b>Tip:</b> sit next to your child, say the words out loud together and ask "What do you think will happen?" before each try.</li>
+        </ul>
+        <p class="note">iPhone/iPad tip: turn the ringer on (the side switch) to hear sound. Tap Share, then "Add to Home Screen", to open it like an app. It works without internet after the first visit.</p>
+      </details>
+
+      <div class="row"><span>Stars and levels</span>
+        <button id="resetProg" class="btn">↺ Start the stars over</button></div>
+    </div>
+  </div>
+
+  <!-- Grown-ups check: a number written in words that a small child cannot type -->
+  <div id="adult" class="hidden"><div class="adult-card">
+    <div class="adult-title">Grown-ups only</div>
+    <div class="adult-q">Type this number: <b id="adultWord"></b></div>
+    <div id="adultDisp" class="adult-disp">– –</div>
+    <div class="keypad">
+      <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+      <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+      <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+      <button data-k="x" class="alt" aria-label="Cancel">✕</button><button data-k="0">0</button><button data-k="b" class="alt" aria-label="Delete">⌫</button>
+    </div>
+  </div></div>
+
+  <canvas id="fx"></canvas>
+</div>
+
+<script src="core.js"></script>
+<script src="games-science.js"></script>
+<script src="games-tech.js"></script>
+<script src="games-eng.js"></script>
+<script src="games-art.js"></script>
+<script src="games-math.js"></script>
+<script src="shell.js"></script>
+</body>
+</html>

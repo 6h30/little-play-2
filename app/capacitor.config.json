@@ -1,0 +1,8 @@
+{
+  "appId": "app.littleplay.steam",
+  "appName": "Little Play 2",
+  "webDir": "www",
+  "backgroundColor": "#cfe4ff",
+  "server": { "androidScheme": "https" },
+  "android": { "allowMixedContent": false }
+}

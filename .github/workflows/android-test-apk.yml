@@ -1,0 +1,48 @@
+name: Android test APK
+
+# Builds a test APK of the Little Play 2 games (a web view around the site files).
+# Run it from the Actions tab (Run workflow); download the APK from the run's Artifacts.
+on:
+  workflow_dispatch: {}
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Copy the site into the app
+        run: |
+          mkdir -p app/www
+          cp -r index.html style.css core.js games-science.js games-tech.js games-eng.js games-art.js games-math.js shell.js manifest.webmanifest icon.svg icon-180.png icon-192.png icon-512.png app/www/
+
+      - name: Create the Android project
+        working-directory: app
+        run: |
+          npm install
+          npx cap add android
+          npx capacitor-assets generate --android
+          npx cap sync android
+
+      - name: Add the screen lock plugin
+        working-directory: app
+        run: node patch-android.mjs
+
+      - name: Build the debug APK
+        working-directory: app/android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LittlePlay2-debug-apk
+          path: app/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error

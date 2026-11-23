@@ -1,0 +1,40 @@
+name: iOS check build
+
+# Builds the iOS app for the simulator with no signing. It needs NO Apple account:
+# run it to check that the iOS project still builds after a change.
+on:
+  workflow_dispatch: {}
+
+jobs:
+  check:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Which Xcode is this?
+        run: xcodebuild -version
+
+      - name: Copy the site into the app
+        run: |
+          mkdir -p app/www
+          cp -r index.html style.css core.js games-science.js games-tech.js games-eng.js games-art.js games-math.js shell.js manifest.webmanifest icon.svg icon-180.png icon-192.png icon-512.png app/www/
+
+      - name: Create the iOS project
+        working-directory: app
+        run: |
+          npm install
+          npx cap add ios
+          npx capacitor-assets generate --ios
+          npx cap sync ios
+          node patch-ios.mjs
+
+      - name: Build for the simulator (no signing)
+        working-directory: app/ios/App
+        run: |
+          xcodebuild -project App.xcodeproj -scheme App -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO build
