@@ -35,8 +35,8 @@ Seventeen tap-and-drag games in five subjects, all in English, no ads, no accoun
 3. **Predict, then check.** Where it fits (sink or float, ramp, colour mixing) the child makes a guess first.
 4. **Everything is spoken and written.** Each instruction is shown in a banner and read aloud; the 🔊 button repeats it. Children who cannot read yet can still play.
 5. **Only taps and drags,** with big buttons. Hints appear after two misses.
-6. **Widely supported emoji only,** so older phones show every picture.
+6. **Detailed pictures.** Every animal and object is drawn as a 3D picture (Fluent Emoji by Microsoft, MIT license, in `img/`). The games still use plain emoji in their code; `core.js` swaps each one for its picture at run time, and shows the plain emoji if a picture is missing.
 
 ## Files
 
-`core.js` (settings, sounds, voice, effects, levels), `games-science.js`, `games-tech.js`, `games-eng.js`, `games-art.js`, `games-math.js`, `shell.js` (home, parent area, timer, screen lock), `style.css`, `sw.js` (offline), `app/` (Capacitor wrapper and the Android and iOS patch scripts), `.github/workflows/` (builds), `IOS-SETUP.md` (steps for the Apple account, in Vietnamese). `_test.js` is a development helper that solves every game automatically in the browser.
+`core.js` (settings, sounds, voice, effects, levels), `games-science.js`, `games-tech.js`, `games-eng.js`, `games-art.js`, `games-math.js`, `shell.js` (home, parent area, timer, screen lock), `style.css`, `img/` (the pictures and their license), `sw.js` (offline), `app/` (Capacitor wrapper and the Android and iOS patch scripts), `.github/workflows/` (builds), `IOS-SETUP.md` (steps for the Apple account, in Vietnamese). `_test.js` is a development helper that solves every game automatically in the browser.

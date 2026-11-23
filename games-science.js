@@ -34,30 +34,30 @@
 `);
 
   /* ===== 1. Sink or Float: guess first, then watch ===== */
-  const FLOAT = [
-    ['🦆', 'duck', 1], ['🔑', 'key', 0], ['🍃', 'leaf', 1], ['🔨', 'hammer', 0], ['⚽', 'ball', 1], ['⚓', 'anchor', 0],
-    ['🍎', 'apple', 1], ['🎈', 'balloon', 1], ['🥄', 'spoon', 0], ['⛵', 'boat', 1], ['🔩', 'bolt', 0], ['🥥', 'coconut', 1],
-    ['🧱', 'brick', 0], ['🍊', 'orange', 1], ['🧊', 'ice cube', 1], ['✂️', 'scissors', 0]
+  const FLOAT = [   // the first 8 are the easy ones
+    ['🦆', 'duck', 1], ['🪨', 'rock', 0], ['🍃', 'leaf', 1], ['🪙', 'coin', 0], ['⚽', 'ball', 1], ['🔑', 'key', 0], ['🎈', 'balloon', 1], ['⚓', 'anchor', 0],
+    ['🍎', 'apple', 1], ['🔨', 'hammer', 0], ['⛵', 'boat', 1], ['🪶', 'feather', 1], ['🔩', 'bolt', 0], ['🪵', 'log', 1], ['🥄', 'spoon', 0], ['🧱', 'brick', 0],
+    ['🍊', 'orange', 1], ['🧊', 'ice cube', 1], ['🥥', 'coconut', 1], ['✂️', 'scissors', 0]
   ];
   BE.DATA.float = FLOAT;
   BE.GAMES.push({
-    id: 'float', subject: 'science', icon: '🦆', color: '#c9f0d2', name: 'Sink or Float',
+    id: 'float', subject: 'science', icon: '🛟', color: '#c9f0d2', name: 'Sink or Float',
     start(api) {
       const root = api.root, lv = BE.Lv('float', 2);
-      root.innerHTML = '<div class="fl-item"></div><div class="fl-water"></div><div class="fl-btns"><button class="big-btn fl-b" data-v="0">⬇️<small>Sink</small></button><button class="big-btn fl-b" data-v="1">⬆️<small>Float</small></button></div>';
+      root.innerHTML = '<div class="fl-item"></div><div class="fl-water"></div><div class="fl-btns"><button class="big-btn fl-b" data-v="0">⬇️<small>Sink</small></button><button class="big-btn fl-b" data-v="1">🛟<small>Float</small></button></div>';
       const item = root.querySelector('.fl-item'), water = root.querySelector('.fl-water');
       let cur = null, busy = false, last = -1;
       function layout() { const H = root.clientHeight; water.style.top = (H * 0.5) + 'px'; }
       function round() {
         busy = false; layout(); const H = root.clientHeight, W = root.clientWidth;
-        const pool = FLOAT.slice(0, [8, 12, 16][lv.n]);
+        const pool = FLOAT.slice(0, [8, 14, 20][lv.n]);
         let i; do { i = Math.floor(Math.random() * pool.length); } while (i === last && pool.length > 1); last = i; cur = pool[i];
         const fs = Math.min(W * 0.3, 120); item.style.fontSize = fs + 'px'; item.className = 'fl-item'; item.textContent = cur[0];
         item.style.transition = 'none'; item.style.top = (H * 0.28) + 'px'; void item.offsetWidth; item.style.transition = '';
         BE.prompt(root, `Will the ${cur[1]} sink or float?`);
         root.querySelectorAll('.fl-b').forEach(b => { b.classList.remove('right', 'wrong'); });
       }
-      function bubbles() { const W = root.clientWidth, H = root.clientHeight; for (let k = 0; k < 5; k++) { const b = document.createElement('div'); b.className = 'fl-bub'; b.textContent = '💧'; b.style.left = (W / 2 + rand(-60, 60)) + 'px'; b.style.top = (H * 0.5 + rand(10, 70)) + 'px'; b.style.animationDelay = (k * 0.12) + 's'; root.appendChild(b); setTimeout(() => b.remove(), 2200); } }
+      function bubbles() { const W = root.clientWidth, H = root.clientHeight; for (let k = 0; k < 5; k++) { const b = document.createElement('div'); b.className = 'fl-bub'; b.textContent = '🫧'; b.style.left = (W / 2 + rand(-60, 60)) + 'px'; b.style.top = (H * 0.5 + rand(10, 70)) + 'px'; b.style.animationDelay = (k * 0.12) + 's'; root.appendChild(b); setTimeout(() => b.remove(), 2200); } }
       root.querySelectorAll('.fl-b').forEach(b => b.addEventListener('pointerup', () => {
         if (busy) return; busy = true;
         const guess = +b.dataset.v, floats = cur[2], ok = guess === floats, H = root.clientHeight, fs = parseFloat(item.style.fontSize);
@@ -81,7 +81,7 @@
   });
 
   /* ===== 2. Magnet Lab: drag the magnet, find what sticks ===== */
-  const MAG = ['📎', '🔩', '🔑', '🔧', '✂️'], NOMAG = ['🍎', '🧸', '🥕', '🎈', '🍃', '⚽', '🖍️', '🧦'];
+  const MAG = ['📎', '🔩', '🔑', '🔧', '✂️'], NOMAG = ['🍎', '🧸', '🥕', '🎈', '🍃', '⚽', '🖍️', '🧦', '🍌', '🪵'];
   BE.GAMES.push({
     id: 'magnet', subject: 'science', icon: '🧲', color: '#d4f5da', name: 'Magnet Lab',
     start(api) {
@@ -179,7 +179,7 @@
   /* ===== 4. Home sweet home: where does this animal live? ===== */
   const HAB = { farm: ['🏡', 'the farm'], ocean: ['🌊', 'the ocean'], forest: ['🌳', 'the forest'], desert: ['🏜️', 'the desert'], polar: ['❄️', 'the snow and ice'] };
   const PETS = [['🐄', 'cow', 'farm'], ['🐔', 'hen', 'farm'], ['🐖', 'pig', 'farm'], ['🐠', 'fish', 'ocean'], ['🐙', 'octopus', 'ocean'], ['🐳', 'whale', 'ocean'],
-    ['🦌', 'deer', 'forest'], ['🦉', 'owl', 'forest'], ['🐿️', 'squirrel', 'forest'], ['🐪', 'camel', 'desert'], ['🦂', 'scorpion', 'desert'], ['🐧', 'penguin', 'polar'], ['🦈', 'shark', 'ocean']];
+    ['🦌', 'deer', 'forest'], ['🦉', 'owl', 'forest'], ['🐿️', 'squirrel', 'forest'], ['🐪', 'camel', 'desert'], ['🦂', 'scorpion', 'desert'], ['🐧', 'penguin', 'polar'], ['🦈', 'shark', 'ocean'], ['🐻‍❄️', 'polar bear', 'polar'], ['🦭', 'seal', 'polar'], ['🦊', 'fox', 'forest']];
   BE.DATA.pets = PETS;
   BE.GAMES.push({
     id: 'habitat', subject: 'science', icon: '🐧', color: '#cdeef5', name: 'Where Do I Live?',

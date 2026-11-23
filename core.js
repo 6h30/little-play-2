@@ -292,4 +292,48 @@
     setTimeout(() => Voice.say(text), 250);
     return el;
   };
+
+  /* ---------- Pictures: emoji are shown as detailed 3D pictures (img/*.webp) once they have loaded ---------- */
+  // The games keep using plain emoji text. Every emoji that has a picture is wrapped in <span class="eimg"> with the picture as its
+  // background, and the emoji stays in the span as text (so the page still works if a picture is missing).
+  BE.pics = (function () {
+    const ok = {};            // emoji -> picture file, only for pictures that have loaded
+    let re = null, map = {};
+    const skip = n => { for (let p = n.parentNode; p; p = p.parentNode) { if (p.nodeType === 1 && (p.classList.contains('eimg') || p.tagName === 'SCRIPT' || p.tagName === 'STYLE' || p.tagName === 'TEXTAREA')) return true; } return false; };
+    function wrapText(n) {
+      if (!re || !n.nodeValue || !n.parentNode || skip(n)) return;
+      re.lastIndex = 0; const s = n.nodeValue; if (!re.test(s)) return; re.lastIndex = 0;
+      const frag = document.createDocumentFragment(); let last = 0, m;
+      while ((m = re.exec(s))) {
+        if (m.index > last) frag.appendChild(document.createTextNode(s.slice(last, m.index)));
+        const sp = document.createElement('span'); sp.className = 'eimg'; sp.textContent = m[0]; sp.style.backgroundImage = `url(img/${ok[m[1]]})`; frag.appendChild(sp); last = m.index + m[0].length;
+      }
+      if (last < s.length) frag.appendChild(document.createTextNode(s.slice(last)));
+      if (n.parentNode) n.parentNode.replaceChild(frag, n);
+    }
+    function wrapAll(root) {
+      if (!re) return;
+      if (root.nodeType === 3) { wrapText(root); return; }
+      if (root.nodeType !== 1 || root.classList.contains('eimg')) return;
+      const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), list = []; let x; while ((x = w.nextNode())) list.push(x);
+      list.forEach(wrapText);
+    }
+    function start() {
+      fetch('img/index.json').then(r => r.json()).then(m => {
+        map = m; const keys = Object.keys(m); let left = keys.length;
+        const done = () => {
+          if (--left > 0) return;
+          const ks = Object.keys(ok).sort((a, b) => b.length - a.length);   // emoji contain no regex special characters
+          if (!ks.length) return; re = new RegExp('(' + ks.join('|') + ')\uFE0F?', 'g');
+          wrapAll(document.body);
+          new MutationObserver(recs => recs.forEach(r => { if (r.type === 'characterData') wrapText(r.target); else r.addedNodes.forEach(wrapAll); }))
+            .observe(document.getElementById('app'), { childList: true, subtree: true, characterData: true });
+        };
+        keys.forEach(k => { const im = new Image(); im.onload = () => { ok[k] = m[k]; done(); }; im.onerror = done; im.src = 'img/' + m[k]; });
+      }).catch(() => { });
+    }
+    return { start };
+  })();
+  BE.css('.eimg { display: inline-block; width: 1.12em; height: 1.12em; line-height: 1; vertical-align: -.2em; overflow: hidden; color: transparent; white-space: nowrap; text-shadow: none; background: center / contain no-repeat; -webkit-text-fill-color: transparent; }');
+  document.addEventListener('DOMContentLoaded', BE.pics.start);
 })();

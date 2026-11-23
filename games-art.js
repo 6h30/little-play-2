@@ -98,7 +98,7 @@
   });
 
   /* ===== 3. Pattern Parade: what comes next? ===== */
-  const PCOL = ['🔴', '🔵', '🟡', '🟢', '🟣', '🟠'], PSHP = ['⭐', '❤️', '🌙', '🍎', '🐟', '🌸', '🚗', '🐥'];
+  const PCOL = ['🔴', '🔵', '🟡', '🟢', '🟣', '🟠'], PSHP = ['⭐', '❤️', '🌙', '🍎', '🐟', '🌸', '🚗', '🐥', '🐱', '🐶', '🍌'];
   BE.GAMES.push({
     id: 'pattern', subject: 'art', icon: '🔴', color: '#ffe0f0', name: 'Pattern Parade',
     start(api) {

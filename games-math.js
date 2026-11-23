@@ -3,7 +3,7 @@
   'use strict';
   const { rand, pick, shuffle, Snd, FX, S, Voice } = BE;
   const NUM = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
-  const THINGS = [['🌸', 'flowers'], ['🍎', 'apples'], ['⭐', 'stars'], ['🐞', 'ladybugs'], ['🎈', 'balloons'], ['🍓', 'strawberries'], ['🦋', 'butterflies'], ['🐟', 'fish'], ['🍪', 'cookies'], ['🐥', 'chicks']];
+  const THINGS = [['🌸', 'flowers'], ['🍎', 'apples'], ['⭐', 'stars'], ['🐞', 'ladybugs'], ['🎈', 'balloons'], ['🍓', 'strawberries'], ['🦋', 'butterflies'], ['🐟', 'fish'], ['🍪', 'cookies'], ['🐥', 'chicks'], ['🍌', 'bananas']];
 
   BE.css(`
 .m-field { position: absolute; left: 0; right: 0; top: calc(var(--st) + 84px); bottom: 150px; }
@@ -11,7 +11,7 @@
 .m-field .it.counted { filter: drop-shadow(0 0 0 #fff) saturate(.5); opacity: .55; }
 .m-field .it .n { position: absolute; left: 50%; top: -6px; transform: translateX(-50%); font-size: .42em; font-weight: 900; color: #fff; background: #7d5cd6; border-radius: 50%; min-width: 1.5em; height: 1.5em; line-height: 1.5em; text-align: center; }
 .m-bar { position: absolute; left: 0; right: 0; bottom: calc(var(--sb) + 14px); min-height: 120px; display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; padding: 0 12px; z-index: 5; }
-.m-basket { position: relative; font-size: 84px; line-height: 1; }
+.m-basket { position: relative; font-size: 104px; line-height: 1; }
 .m-basket .badge { position: absolute; right: -14px; top: -14px; background: #7d5cd6; color: #fff; font-weight: 900; font-size: 30px; min-width: 52px; height: 52px; line-height: 52px; text-align: center; border-radius: 50%; box-shadow: 0 4px 0 rgba(0,0,0,.15); }
 .m-ans { width: min(96px, 22vh); height: min(96px, 22vh); font-size: min(48px, 11vh); }
 @media (max-height: 520px) { .bal { top: calc(var(--st) + 96px); bottom: 104px; } .m-tray { bottom: calc(var(--sb) + 6px); } .m-bar { min-height: 90px; bottom: calc(var(--sb) + 8px); } .m-field { bottom: 110px; } .m-eq { bottom: 110px; } }
@@ -212,7 +212,7 @@
       let objs = [], next = 0, busy = false, up = true, tries = 0;
       function round() {
         busy = false; next = 0; tries = 0; objs.forEach(o => o.el.remove()); objs = [];
-        const n = [3, 4, 5][lv.n], th = pick(['🐻', '🌳', '🏠', '🍎', '🦆', '🐘', '🎈', '🚗']);
+        const n = [3, 4, 5][lv.n], th = pick(['🐻', '🌳', '🏠', '🍎', '🦆', '🐘', '🎈', '🚗', '🐱', '🐶']);
         up = Math.random() < 0.65 || lv.n === 0;
         BE.prompt(root, up ? 'Tap them from the smallest to the biggest!' : 'Now from the biggest to the smallest!');
         const W = area.clientWidth, H = area.clientHeight;
