@@ -214,6 +214,12 @@
   /* ---------- Start ---------- */
   function boot() {
     renderMenu();
+    // a link like ?game=robot opens that game straight away (used to take the store screenshots)
+    const want = new URLSearchParams(location.search).get('game'), wg = want && BE.GAMES.find(x => x.id === want);
+    if (wg) setTimeout(() => {   // wait a moment so the screen has its real size
+      view = wg.subject; startGame(wg);
+      if (/[?&]shot/.test(location.search)) { const sc = document.createElement('script'); sc.src = '_shot.js'; document.body.appendChild(sc); }
+    }, 500);
     if (isNative()) {
       const root = document.documentElement;
       root.classList.add('native');

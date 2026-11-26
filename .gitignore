@@ -6,3 +6,4 @@ app/ios/
 .DS_Store
 _emoji_*.json
 _fluent_tree.json
+_shot.js
